@@ -1,0 +1,596 @@
+/* ============================================================
+   Login screen styles — Google Sign-in style recreation
+   Font: Noto Sans KR (loaded via <link> in login.html)
+   ============================================================ */
+
+/* ---------- Reset / base ---------- */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html,
+body {
+  height: 100%;
+}
+
+body {
+  font-family: "Noto Sans KR", "Roboto", Arial, sans-serif;
+  color: #202124;
+  background-color: #f0f4f9;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+/* ---------- Layout wrapper ---------- */
+.page {
+  flex: 1 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+}
+
+/* ---------- Card ---------- */
+.card {
+  position: relative;
+  width: 100%;
+  max-width: 1040px;
+  min-height: 420px;
+  background: #ffffff;
+  border-radius: 28px;
+  padding: 48px 56px;
+  display: flex;
+  gap: 40px;
+  box-shadow: none;
+  overflow: hidden; /* 상단 로딩바가 둥근 모서리에 맞게 잘리도록 */
+}
+
+/* ============================================================
+   상단 로딩바 (Material indeterminate linear progress)
+   - 카드 최상단에서 파란 막대가 지나가는 로딩 인디케이터
+   ============================================================ */
+.progress {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 4px;
+  overflow: hidden;
+  display: none;
+}
+
+.progress.is-active {
+  display: block;
+}
+
+.progress__buffer {
+  position: absolute;
+  inset: 0;
+  background: #d3e3fd; /* 연한 파랑 트랙 */
+}
+
+.progress__bar {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  transform-origin: top left;
+  transform: scaleX(0);
+}
+
+.progress__inner {
+  display: inline-block;
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  background-color: #0b57d0; /* 파란 막대 */
+  transform-origin: top left;
+}
+
+.progress.is-active .progress__bar--primary {
+  left: -145.166611%;
+  animation: gf-primary-translate 2s infinite linear;
+}
+
+.progress.is-active .progress__bar--primary .progress__inner {
+  animation: gf-primary-scale 2s infinite linear;
+}
+
+.progress.is-active .progress__bar--secondary {
+  left: -54.888891%;
+  animation: gf-secondary-translate 2s infinite linear;
+}
+
+.progress.is-active .progress__bar--secondary .progress__inner {
+  animation: gf-secondary-scale 2s infinite linear;
+}
+
+@keyframes gf-primary-translate {
+  0% { transform: translateX(0); }
+  20% {
+    animation-timing-function: cubic-bezier(0.5, 0, 0.701732, 0.495819);
+    transform: translateX(0);
+  }
+  59.15% {
+    animation-timing-function: cubic-bezier(0.302435, 0.381352, 0.55, 0.956352);
+    transform: translateX(83.67142%);
+  }
+  100% { transform: translateX(200.611057%); }
+}
+
+@keyframes gf-primary-scale {
+  0% { transform: scaleX(0.08); }
+  36.65% {
+    animation-timing-function: cubic-bezier(0.334731, 0.12482, 0.785844, 1);
+    transform: scaleX(0.08);
+  }
+  69.15% {
+    animation-timing-function: cubic-bezier(0.06, 0.11, 0.6, 1);
+    transform: scaleX(0.661479);
+  }
+  100% { transform: scaleX(0.08); }
+}
+
+@keyframes gf-secondary-translate {
+  0% {
+    animation-timing-function: cubic-bezier(0.15, 0, 0.515058, 0.409685);
+    transform: translateX(0);
+  }
+  25% {
+    animation-timing-function: cubic-bezier(0.31033, 0.284058, 0.8, 0.733712);
+    transform: translateX(37.651913%);
+  }
+  48.35% {
+    animation-timing-function: cubic-bezier(0.4, 0.627035, 0.6, 0.902026);
+    transform: translateX(84.386165%);
+  }
+  100% { transform: translateX(160.277782%); }
+}
+
+@keyframes gf-secondary-scale {
+  0% {
+    animation-timing-function: cubic-bezier(0.205028, 0.057051, 0.57661, 0.453971);
+    transform: scaleX(0.08);
+  }
+  19.15% {
+    animation-timing-function: cubic-bezier(0.152313, 0.196432, 0.648374, 1.004315);
+    transform: scaleX(0.457104);
+  }
+  44.15% {
+    animation-timing-function: cubic-bezier(0.257759, -0.003163, 0.211762, 1.38179);
+    transform: scaleX(0.72796);
+  }
+  100% { transform: scaleX(0.08); }
+}
+
+/* ---------- Left column (heading) ---------- */
+.card__left {
+  flex: 1 1 46%;
+  display: flex;
+  flex-direction: column;
+  padding-top: 8px;
+}
+
+.logo {
+  width: 42px;
+  height: 42px;
+  margin-bottom: 18px;
+}
+
+.card__title {
+  font-size: 40px;
+  font-weight: 400;
+  line-height: 1.25;
+  letter-spacing: -0.5px;
+  color: #1f1f1f;
+  margin-bottom: 16px;
+}
+
+.card__subtitle {
+  font-size: 16px;
+  font-weight: 400;
+  color: #1f1f1f;
+}
+
+/* ---------- Right column (form) ---------- */
+/* 원본과 동일하게: 좌측 헤더는 상단 정렬, 우측 폼은 세로 중앙 정렬 */
+.card__right {
+  flex: 1 1 54%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+/* ---------- Text field (Material floating label) ---------- */
+.field {
+  position: relative;
+  margin-top: 6px;
+}
+
+.field__input {
+  width: 100%;
+  height: 56px;
+  padding: 13px 15px;
+  font-family: inherit;
+  font-size: 16px;
+  color: #1f1f1f;
+  background: transparent;
+  border: 1px solid #747775;
+  border-radius: 8px;
+  outline: none;
+  transition: border-color 0.15s ease, border-width 0.15s ease;
+}
+
+.field__input:hover {
+  border-color: #1f1f1f;
+}
+
+.field__input:focus {
+  border: 2px solid #0b57d0;
+  padding: 12px 14px; /* compensate for +1px border to avoid text shift */
+}
+
+/* Floating label */
+.field__label {
+  position: absolute;
+  left: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  padding: 0 4px;
+  font-size: 16px;
+  color: #5e5e5e;
+  background: #ffffff;
+  pointer-events: none;
+  transition: all 0.15s ease;
+}
+
+.field__input:focus + .field__label,
+.field__input:not(:placeholder-shown) + .field__label {
+  top: 0;
+  font-size: 12px;
+  color: #0b57d0;
+}
+
+.field__input:not(:focus):not(:placeholder-shown) + .field__label {
+  color: #5e5e5e;
+}
+
+/* ---------- 입력 오류 표시 (구글식 빨간 안내) ---------- */
+.field__error {
+  display: none;
+  margin-top: 6px;
+  padding-left: 16px;
+  font-size: 12px;
+  line-height: 1.4;
+  color: #d93025;
+}
+
+.field__error.is-visible {
+  display: block;
+}
+
+.field--error .field__input,
+.field--error .field__input:hover {
+  border-color: #d93025;
+}
+
+.field--error .field__input:focus {
+  border: 2px solid #d93025;
+  padding: 12px 14px;
+}
+
+/* 오류 상태에서는 라벨도 빨간색 (포커스 파란색보다 우선) */
+.field--error .field__label,
+.field--error .field__input:focus + .field__label,
+.field--error .field__input:not(:placeholder-shown) + .field__label {
+  color: #d93025;
+}
+
+/* ---------- Links ---------- */
+.link {
+  color: #0b57d0;
+  text-decoration: none;
+  font-weight: 500;
+}
+
+.link:hover {
+  text-decoration: underline;
+}
+
+.forgot {
+  display: inline-block;
+  margin-top: 20px;
+  font-size: 14px;
+}
+
+.guest {
+  margin-top: 28px;
+  font-size: 14px;
+  line-height: 1.5;
+  color: #1f1f1f;
+}
+
+/* ---------- Action row ---------- */
+.actions {
+  margin-top: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+.btn-text {
+  background: transparent;
+  border: none;
+  border-radius: 4px;
+  color: #0b57d0;
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 500;
+  padding: 10px 12px;
+  cursor: pointer;
+}
+
+.btn-text:hover {
+  background: rgba(11, 87, 208, 0.06);
+}
+
+.btn-primary {
+  background: #0b57d0;
+  border: none;
+  border-radius: 100px;
+  color: #ffffff;
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 500;
+  padding: 10px 24px;
+  cursor: pointer;
+  transition: background 0.15s ease, box-shadow 0.15s ease;
+}
+
+.btn-primary:hover {
+  background: #0b57d0;
+  box-shadow: 0 1px 3px rgba(60, 64, 67, 0.3),
+    0 4px 8px rgba(60, 64, 67, 0.15);
+}
+
+.btn-primary:active {
+  background: #0842a0;
+}
+
+/* ---------- Footer ---------- */
+.footer {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 18px 48px;
+  font-size: 12px;
+  color: #444746;
+}
+
+.lang {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: #1f1f1f;
+  cursor: pointer;
+  padding: 6px 8px;
+  border-radius: 4px;
+}
+
+.lang:hover {
+  background: rgba(31, 31, 31, 0.05);
+}
+
+.lang__caret {
+  width: 18px;
+  height: 18px;
+  fill: #444746;
+}
+
+.footer__links {
+  display: flex;
+  gap: 6px;
+}
+
+.footer__links a {
+  color: #444746;
+  text-decoration: none;
+  padding: 6px 12px;
+  border-radius: 4px;
+}
+
+.footer__links a:hover {
+  background: rgba(31, 31, 31, 0.05);
+}
+
+/* ============================================================
+   Password screen additions
+   ============================================================ */
+
+/* ---------- Account chip (email + dropdown) ---------- */
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  max-width: 240px;
+  margin-top: 4px;
+  padding: 3px 12px 3px 4px;
+  background: transparent;
+  border: 1px solid #747775;
+  border-radius: 100px;
+  font-family: inherit;
+  font-size: 14px;
+  color: #1f1f1f;
+  cursor: pointer;
+  transition: background 0.15s ease, box-shadow 0.15s ease;
+}
+
+.chip:hover {
+  background: rgba(31, 31, 31, 0.05);
+}
+
+.chip:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 2px #0b57d0;
+}
+
+.chip__avatar {
+  flex: 0 0 auto;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: #e3e3e3;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.chip__avatar svg {
+  width: 16px;
+  height: 16px;
+  fill: #5f6368;
+}
+
+.chip__email {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.chip__caret {
+  flex: 0 0 auto;
+  width: 18px;
+  height: 18px;
+  fill: #444746;
+}
+
+/* ---------- Show-password checkbox ---------- */
+.checkbox {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 20px;
+  font-size: 14px;
+  color: #1f1f1f;
+  cursor: pointer;
+  user-select: none;
+}
+
+.checkbox input {
+  position: absolute;
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.checkbox__box {
+  flex: 0 0 auto;
+  width: 18px;
+  height: 18px;
+  border: 2px solid #5e5e5e;
+  border-radius: 3px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.12s ease, border-color 0.12s ease;
+}
+
+.checkbox__box svg {
+  width: 16px;
+  height: 16px;
+  fill: #ffffff;
+  opacity: 0;
+  transition: opacity 0.12s ease;
+}
+
+.checkbox input:checked + .checkbox__box {
+  background: #0b57d0;
+  border-color: #0b57d0;
+}
+
+.checkbox input:checked + .checkbox__box svg {
+  opacity: 1;
+}
+
+.checkbox input:focus-visible + .checkbox__box {
+  box-shadow: 0 0 0 2px rgba(11, 87, 208, 0.4);
+}
+
+/* ============================================================
+   Notice screen additions
+   ============================================================ */
+.notice-card {
+  min-height: 360px;
+}
+
+.notice-content {
+  gap: 18px;
+  font-size: 15px;
+  line-height: 1.7;
+  color: #1f1f1f;
+}
+
+.notice-content p {
+  max-width: 520px;
+}
+
+.notice-lead {
+  font-size: 18px;
+  font-weight: 500;
+  line-height: 1.55;
+}
+
+/* ---------- Responsive: stack columns (mobile) ---------- */
+@media (max-width: 768px) {
+  .page {
+    padding: 0;
+    align-items: stretch;
+  }
+
+  .card {
+    max-width: 100%;
+    border-radius: 0;
+    flex-direction: column;
+    padding: 48px 28px 24px;
+    min-height: 0;
+    gap: 24px;
+  }
+
+  .card__left {
+    align-items: center;
+    text-align: center;
+    padding-top: 0;
+  }
+
+  .card__title {
+    font-size: 28px;
+  }
+
+  .actions {
+    padding-top: 48px;
+  }
+
+  .notice-content {
+    font-size: 14px;
+    line-height: 1.65;
+  }
+
+  .notice-lead {
+    font-size: 16px;
+  }
+
+  .footer {
+    flex-direction: column;
+    gap: 12px;
+    padding: 16px;
+  }
+}
