@@ -198,7 +198,7 @@ function initPasswordScreen() {
 
   // 아이디 정보가 없으면 이메일 입력 화면으로 되돌린다.
   if (!identifier) {
-    window.location.replace(TrainingTracking.buildUrl("login.html"));
+    window.location.replace(TrainingTracking.buildUrl("index.html"));
     return;
   }
 
@@ -213,7 +213,7 @@ function initPasswordScreen() {
     );
     // 이메일부 드롭다운 클릭 → 기존 아이디를 유지한 채 이메일 입력 화면으로 복귀
     chip.addEventListener("click", function () {
-      window.location.href = TrainingTracking.buildUrl("login.html");
+      window.location.href = TrainingTracking.buildUrl("index.html");
     });
   }
 
