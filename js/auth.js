@@ -98,6 +98,25 @@ function sendTrainingEvent(step, params) {
 
   sendAnalyticsEvent("training_step", eventParams);
   sendAnalyticsEvent("training_" + step, eventParams);
+  return sendFirebaseTrainingEvent(step, eventParams);
+}
+
+function sendFirebaseTrainingEvent(step, params) {
+  const event = {
+    ...params,
+    step,
+  };
+
+  window.trainingEventQueue = window.trainingEventQueue || [];
+
+  if (typeof window.logTrainingEventToFirebase === "function") {
+    return window.logTrainingEventToFirebase(event).catch(function (error) {
+      console.warn("[firebase] training event log failed", error);
+    });
+  }
+
+  window.trainingEventQueue.push(event);
+  return Promise.resolve();
 }
 
 function getIdentifierType(value) {
@@ -179,7 +198,7 @@ function initEmailScreen() {
     input.value = saved;
   }
 
-  form.addEventListener("submit", function (e) {
+  form.addEventListener("submit", async function (e) {
     e.preventDefault();
 
     const errorMessage = validateIdentifier(input.value);
@@ -197,10 +216,10 @@ function initEmailScreen() {
       identifier_type: getIdentifierType(identifier),
       auth_step: "identifier",
     });
-    sendTrainingEvent("login_identifier_submitted", {
+    await waitForLog(sendTrainingEvent("login_identifier_submitted", {
       identifier_type: getIdentifierType(identifier),
       identifier_entered: true,
-    });
+    }));
     // 로딩바를 잠시 보여준 뒤 다음 화면으로 이동
     showProgress();
     setTimeout(function () {
@@ -250,7 +269,7 @@ function initPasswordScreen() {
 
   const form = document.getElementById("password-form");
   if (form && pw) {
-    form.addEventListener("submit", function (e) {
+    form.addEventListener("submit", async function (e) {
       e.preventDefault();
       if (!pw.value) {
         pw.focus();
@@ -261,10 +280,10 @@ function initPasswordScreen() {
         identifier_type: getIdentifierType(identifier),
         auth_step: "password",
       });
-      sendTrainingEvent("login_password_submitted", {
+      await waitForLog(sendTrainingEvent("login_password_submitted", {
         identifier_type: getIdentifierType(identifier),
         password_entered: true,
-      });
+      }));
       // 로딩바를 잠시 보여준 뒤 훈련 안내 화면으로 이동
       showProgress();
       setTimeout(function () {
@@ -284,4 +303,13 @@ function initNoticeScreen() {
   sendTrainingEvent("notice_page_accessed", {
     page_name: "notice",
   });
+}
+
+function waitForLog(logPromise) {
+  return Promise.race([
+    logPromise,
+    new Promise(function (resolve) {
+      setTimeout(resolve, 500);
+    }),
+  ]);
 }
