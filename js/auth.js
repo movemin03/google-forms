@@ -8,7 +8,7 @@ const AUTH_KEY = "gf_signin_identifier";
 const TRAINING_ID_KEY = "gf_training_id";
 const RECIPIENT_ID_KEY = "gf_recipient_id";
 const DEBUG_MODE_KEY = "gf_debug_mode";
-const GA_MEASUREMENT_ID = "G-L92HHMB9Y9";
+const GA_MEASUREMENT_ID = "G-BXBVJ894SD";
 const TRACKING_VALUE_RE = /^[A-Za-z0-9_-]{3,128}$/;
 
 const Auth = {
