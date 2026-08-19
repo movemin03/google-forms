@@ -7,6 +7,7 @@
 const AUTH_KEY = "gf_signin_identifier";
 const TRAINING_ID_KEY = "gf_training_id";
 const RECIPIENT_ID_KEY = "gf_recipient_id";
+const DEBUG_MODE_KEY = "gf_debug_mode";
 const GA_MEASUREMENT_ID = "G-L92HHMB9Y9";
 const TRACKING_VALUE_RE = /^[A-Za-z0-9_-]{3,128}$/;
 
@@ -27,9 +28,13 @@ const TrainingTracking = {
     const params = new URLSearchParams(window.location.search);
     const trainingId = normalizeTrackingValue(params.get("tid"));
     const recipientId = normalizeTrackingValue(params.get("rid"));
+    const debugMode = params.get("debug");
 
     if (trainingId) sessionStorage.setItem(TRAINING_ID_KEY, trainingId);
     if (recipientId) sessionStorage.setItem(RECIPIENT_ID_KEY, recipientId);
+    if (debugMode === "1" || debugMode === "true") {
+      sessionStorage.setItem(DEBUG_MODE_KEY, "1");
+    }
   },
   getTrainingId() {
     return sessionStorage.getItem(TRAINING_ID_KEY) || "";
@@ -37,11 +42,24 @@ const TrainingTracking = {
   getRecipientId() {
     return sessionStorage.getItem(RECIPIENT_ID_KEY) || "";
   },
+  isDebugMode() {
+    return sessionStorage.getItem(DEBUG_MODE_KEY) === "1";
+  },
   getParams() {
-    return {
-      training_id: this.getTrainingId(),
-      recipient_id: this.getRecipientId(),
+    const trainingId = this.getTrainingId();
+    const recipientId = this.getRecipientId();
+    const params = {
+      training_id: trainingId,
+      recipient_id: recipientId,
+      tid: trainingId,
+      rid: recipientId,
     };
+
+    if (this.isDebugMode()) {
+      params.debug_mode = true;
+    }
+
+    return params;
   },
   buildUrl(path) {
     const params = new URLSearchParams();
@@ -50,6 +68,7 @@ const TrainingTracking = {
 
     if (trainingId) params.set("tid", trainingId);
     if (recipientId) params.set("rid", recipientId);
+    if (this.isDebugMode()) params.set("debug", "1");
 
     const query = params.toString();
     return query ? path + "?" + query : path;
@@ -71,11 +90,14 @@ function sendAnalyticsEvent(eventName, params) {
 }
 
 function sendTrainingEvent(step, params) {
-  sendAnalyticsEvent("training_step", {
+  const eventParams = {
     ...TrainingTracking.getParams(),
     training_step: step,
     ...params,
-  });
+  };
+
+  sendAnalyticsEvent("training_step", eventParams);
+  sendAnalyticsEvent("training_" + step, eventParams);
 }
 
 function getIdentifierType(value) {
